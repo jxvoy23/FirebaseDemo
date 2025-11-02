@@ -3,10 +3,13 @@ package aydin.firebasedemo;
 public class Person {
     private String name;
     private int age;
+    private String phoneNumber; // New field
 
-    public Person(String name, int age) {
+    // Updated constructor
+    public Person(String name, int age, String phoneNumber) {
         this.name = name;
         this.age = age;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getName() {
@@ -17,7 +20,6 @@ public class Person {
         this.name = name;
     }
 
-
     public int getAge() {
         return age;
     }
@@ -26,4 +28,12 @@ public class Person {
         this.age = age;
     }
 
+    // New getter and setter
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 }

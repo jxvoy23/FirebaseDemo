@@ -5,8 +5,6 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.UserRecord;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -30,13 +28,15 @@ public class PrimaryController {
     private TextField nameTextField;
 
     @FXML
+    private TextField phoneTextField; // Added for Part 2b
+
+    @FXML
     private TextArea outputTextArea;
 
     @FXML
     private Button readButton;
 
-    @FXML
-    private Button registerButton;
+    // 'registerButton' is removed, as requested in Part 2a
 
     @FXML
     private Button switchSecondaryViewButton;
@@ -44,6 +44,7 @@ public class PrimaryController {
     @FXML
     private Button writeButton;
 
+    // These were the missing class-level variables
     private boolean key;
     private ObservableList<Person> listOfUsers = FXCollections.observableArrayList();
     private Person person;
@@ -53,23 +54,17 @@ public class PrimaryController {
     }
 
     void initialize() {
-
         AccessDataView accessDataViewModel = new AccessDataView();
         nameTextField.textProperty().bindBidirectional(accessDataViewModel.personNameProperty());
         writeButton.disableProperty().bind(accessDataViewModel.isWritePossibleProperty().not());
     }
-
 
     @FXML
     void readButtonClicked(ActionEvent event) {
         readFirebase();
     }
 
-    @FXML
-    void registerButtonClicked(ActionEvent event) {
-        registerUser();
-    }
-
+    // 'registerButtonClicked' method is removed (Part 2a)
 
     @FXML
     void writeButtonClicked(ActionEvent event) {
@@ -80,6 +75,7 @@ public class PrimaryController {
     private void switchToSecondary() throws IOException {
         DemoApp.setRoot("secondary");
     }
+
     public boolean readFirebase()
     {
         key = false;
@@ -95,19 +91,30 @@ public class PrimaryController {
             {
                 System.out.println("Getting (reading) data from firabase database....");
                 listOfUsers.clear();
+                outputTextArea.clear(); // Clear before re-populating
                 for (QueryDocumentSnapshot document : documents)
                 {
-                    outputTextArea.setText(outputTextArea.getText()+ document.getData().get("Name")+ " , Age: "+
-                            document.getData().get("Age")+ " \n ");
+                    // Updated for Part 2b to include Phone
+                    outputTextArea.setText(outputTextArea.getText()
+                            + "Name: " + document.getData().get("Name")
+                            + ", Age: " + document.getData().get("Age")
+                            + ", Phone: " + document.getData().get("Phone") + " \n ");
+
                     System.out.println(document.getId() + " => " + document.getData().get("Name"));
-                    person  = new Person(String.valueOf(document.getData().get("Name")),
-                            Integer.parseInt(document.getData().get("Age").toString()));
+
+                    // Updated for Part 2b to include Phone
+                    person  = new Person(
+                            String.valueOf(document.getData().get("Name")),
+                            Integer.parseInt(document.getData().get("Age").toString()),
+                            String.valueOf(document.getData().get("Phone")) // Get phone
+                    );
                     listOfUsers.add(person);
                 }
             }
             else
             {
                 System.out.println("No data");
+                outputTextArea.setText("No data found in 'Persons' collection.");
             }
             key=true;
 
@@ -119,39 +126,22 @@ public class PrimaryController {
         return key;
     }
 
-    public boolean registerUser() {
-        UserRecord.CreateRequest request = new UserRecord.CreateRequest()
-                .setEmail("user222@example.com")
-                .setEmailVerified(false)
-                .setPassword("secretPassword")
-                .setPhoneNumber("+11234567890")
-                .setDisplayName("John Doe")
-                .setDisabled(false);
-
-        UserRecord userRecord;
-        try {
-            userRecord = DemoApp.fauth.createUser(request);
-            System.out.println("Successfully created new user with Firebase Uid: " + userRecord.getUid()
-            + " check Firebase > Authentication > Users tab");
-            return true;
-
-        } catch (FirebaseAuthException ex) {
-            // Logger.getLogger(FirestoreContext.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Error creating a new user in the firebase");
-            return false;
-        }
-
-    }
+    // 'registerUser' method is removed (Part 2a)
 
     public void addData() {
-
         DocumentReference docRef = DemoApp.fstore.collection("Persons").document(UUID.randomUUID().toString());
 
         Map<String, Object> data = new HashMap<>();
         data.put("Name", nameTextField.getText());
         data.put("Age", Integer.parseInt(ageTextField.getText()));
+        data.put("Phone", phoneTextField.getText()); // Added for Part 2b
 
         //asynchronously write data
         ApiFuture<WriteResult> result = docRef.set(data);
+
+        // Clear fields after adding
+        nameTextField.clear();
+        ageTextField.clear();
+        phoneTextField.clear();
     }
-}
+}              // Updated for Part 2b to include Phone
