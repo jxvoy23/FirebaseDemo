@@ -4,7 +4,6 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-
 import com.google.firebase.cloud.FirestoreClient;
 
 import java.io.FileInputStream;
@@ -15,14 +14,19 @@ public class FirestoreContext {
     public Firestore firebase() {
         try {
 
+            // 1. Removed the extra "FileInputStream; serviceAccount ="
+            // 2. Escaped the backslashes in the file path ("H:\\Downloads...")
             FileInputStream serviceAccount =
-                    new FileInputStream("\"H:\\Downloads\\fir-demo-7ebfa-firebase-adminsdk-fbsvc-33b9ddb288.json\"");
+                    new FileInputStream("H:\\Downloads\\key.json");
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
-            FirebaseApp.initializeApp(options);
+            // Check if the app is already initialized to avoid crashing
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+            }
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -30,6 +34,4 @@ public class FirestoreContext {
         }
         return FirestoreClient.getFirestore();
     }
-
-
 }
