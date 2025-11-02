@@ -14,8 +14,8 @@ public class FirestoreContext {
     public Firestore firebase() {
         try {
 
-            // 1. Removed the extra "FileInputStream; serviceAccount ="
-            // 2. Escaped the backslashes in the file path ("H:\\Downloads...")
+
+
             FileInputStream serviceAccount =
                     new FileInputStream("H:\\Downloads\\key.json");
 
@@ -23,7 +23,7 @@ public class FirestoreContext {
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
-            // Check if the app is already initialized to avoid crashing
+
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
             }
